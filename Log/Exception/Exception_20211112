@@ -1,0 +1,5 @@
+[2021-11-12 19:19:08]
+StarCore\Exception\DBException: 【keya】配置文件不存在：D:\www-x\StarCore\Config\DBConfig\DBConfig.keya.php in D:\www-x\StarCore\Common\DBPool.php:63 ErrorCode:0
+Stack trace:
+    D:\www-x\StarCore\Common\DBPool.php(38): StarCore\Common\DBPool->GetConfig(["keya"])
+    D:\www-x\StarCore\bootstrap.php(26): StarCore\Common\DBPool->GetDB(["keya"])

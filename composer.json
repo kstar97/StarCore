@@ -1,0 +1,20 @@
+{
+  "name": "star/starcore",
+  "autoload": {
+    "psr-4": {
+      "StarCore\\": "."
+    }
+  },
+  "authors": [
+    {
+      "name": "zexinyao",
+      "email": "516137566@qq.com"
+    }
+  ],
+  "require": {
+    "ext-mbstring": "*",
+    "ext-pdo": "*",
+    "ext-curl": "*",
+    "ext-sockets": "*"
+  }
+}

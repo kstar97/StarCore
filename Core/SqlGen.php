@@ -1,0 +1,124 @@
+<?php
+
+
+namespace StarCore\Core;
+
+
+class SqlGen
+{
+    private string $table;
+    private string $field;
+    private string $where;
+    private string $order;
+    private string $limit;
+    private array $whereData;
+
+    public function __construct()
+    {
+        $this->reset();
+    }
+
+    public function reset()
+    {
+        $this->table = '';
+        $this->field = '*';
+        $this->where = 'WHERE 1 ';
+        $this->order = '';
+        $this->limit = '';
+        $this->whereData = [];
+    }
+
+    /**
+     * @param string $table
+     */
+    public function table(string $table)
+    {
+        $this->table = "`{$table}`";
+    }
+
+    /**
+     * @param string ...$fields
+     */
+    public function field(string ...$fields)
+    {
+        $this->field = '`' . implode('`,`', $fields) . '`';
+    }
+
+    /**
+     * @param string $field
+     * @param string $Operator
+     * @param string|int $value
+     * @param string $logic
+     */
+    public function where(string $field, string $Operator, string|int $value, string $logic = "AND")
+    {
+        $this->where .= "{$logic} {$field} {$Operator} ? ";
+        $this->whereData[] = $value;
+    }
+
+    /**
+     * @param string $order
+     */
+    public function order(string $order)
+    {
+        $this->order = "ORDER BY " . $order;
+    }
+
+    /**
+     * @param int ...$limit
+     */
+    public function limit(int ...$limit)
+    {
+        $this->limit = "LIMIT " . implode(',', $limit);
+    }
+
+    /**
+     * @return array
+     */
+    public function whereData(): array
+    {
+        return $this->whereData;
+    }
+
+    /**
+     * @param array $data
+     * @return string
+     */
+    public function insert(array $data): string
+    {
+        #INSERT INTO `user` (`name`, `home`) VALUES ('xxx', 'xxx')
+        $fields = '`' . implode('`,`', array_keys($data)) . '`';
+        $values = implode(",", array_fill(0, count($data), '?'));
+        return "INSERT INTO {$this->table} ({$fields}) VALUES ({$values})";
+    }
+
+    /**
+     * @return string
+     */
+    public function select(): string
+    {
+        #SELECT *　FROM user WHERE 1=1 ORDER BY LIMIT 1
+        return "SELECT {$this->field} FROM {$this->table} {$this->where} {$this->order} {$this->limit}";
+    }
+
+    /**
+     * @param array $data
+     * @return string
+     */
+    public function update(array $data): string
+    {
+        #UPDATE `user` SET `home`='aaa' WHERE (`id`='1')
+        $fields = '`' . implode('`=? ,`', array_keys($data)) . '`=?';
+        return "UPDATE {$this->table} SET {$fields} {$this->where}";
+    }
+
+    /**
+     * @param array $data
+     * @return string
+     */
+    public function delete(): string
+    {
+        #DELETE FROM `user` WHERE (`id`='1')
+        return "DELETE FROM {$this->table} {$this->where}";
+    }
+}
