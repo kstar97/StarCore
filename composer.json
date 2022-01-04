@@ -1,5 +1,5 @@
 {
-  "name": "star/starcore",
+  "name": "kstar97/starcore",
   "autoload": {
     "psr-4": {
       "StarCore\\": "."
