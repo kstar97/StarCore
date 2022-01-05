@@ -30,19 +30,19 @@ class File
     }
 
     /**
-     * @param int $line
+     * @param int $rows
      * @return array
      * 从文件取走N行数据（会修改文件）
      * $line：取走行数，默认1
      */
-    public function getDataByLine(int $line = 1): array
+    public function getDataByRows(int $rows = 1): array
     {
         $contentArr = array();
         $content = "";
         $handle = fopen($this->fileName, "r+");
         flock($handle, LOCK_EX);
         //读取内容
-        for ($i = 0; $i < $line; $i++) {
+        for ($i = 0; $i < $rows; $i++) {
             $content = fgets($handle);
             if (empty($content)) {
                 //文件已读完
