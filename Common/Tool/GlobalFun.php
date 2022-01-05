@@ -4,6 +4,8 @@
 namespace StarCore\Common\Tool;
 
 
+use Exception;
+
 class GlobalFun
 {
     /**
@@ -38,15 +40,16 @@ class GlobalFun
     public static function getParam(string $paramName): string
     {
         $param = "";
-        if (!isset($_REQUEST[$paramName])) return $param;
+        if (!isset($_REQUEST[$paramName])) {
+            return $param;
+        }
         //去掉空格与换行
         $param = trim($_REQUEST[$paramName]);
         //转义特殊字符
         $param = addslashes($param);
         //转换编码
         $encode = mb_detect_encoding($param, array("ASCII", "UTF-8", "GB2312", "GBK", "BIG5"));
-        $param = mb_convert_encoding($param, 'UTF-8', $encode);
-        return $param;
+        return mb_convert_encoding($param, 'UTF-8', $encode);
     }
 
     /**
@@ -92,5 +95,18 @@ class GlobalFun
         }
         curl_close($ch);
         return $tmp_sources;
+    }
+
+    /**
+     * @param string $file
+     * @return void
+     * 检查文件是否存在
+     * @throws Exception
+     */
+    public static function checkFile(string $file)
+    {
+        if (!is_file($file)) {
+            throw new Exception("文件不存在：" . $file);
+        }
     }
 }
