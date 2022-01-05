@@ -22,8 +22,8 @@ MainException::Start(DEBUG, LOG_PATH . 'Exception' . DIRECTORY_SEPARATOR);
 
 
 //test
-DBPool::GetInstance()->Init(CONFIG_PATH . 'DBConfig' . DIRECTORY_SEPARATOR);
-$db = DBPool::GetInstance()->GetDB('key');
+DBPool::getInstance()->init(CONFIG_PATH . 'DBConfig' . DIRECTORY_SEPARATOR);
+$db = DBPool::getInstance()->getDB('key');
 
 //查
 $data = $db->table('user')->where('id', '=', 1)->selectOne();

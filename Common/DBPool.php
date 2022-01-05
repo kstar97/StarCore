@@ -4,7 +4,6 @@
 namespace StarCore\Common;
 
 use StarCore\Core\DB;
-use StarCore\Core\BaseInstance;
 use StarCore\Exception\DBException;
 
 /**
@@ -18,9 +17,13 @@ class DBPool
     /**
      * 单例
      */
-    protected function __construct(){}
+    protected function __construct()
+    {
+    }
+
     private static ?self $instance = null;
-    public static function GetInstance(): self
+
+    public static function getInstance(): self
     {
         if (is_null(self::$instance)) {
             self::$instance = new self;
@@ -30,10 +33,12 @@ class DBPool
 
     private string $configPath = "";
     private array $pool = [];
+
     /**
-     * @param $configPath 数据库配置文件路径
+     * @param string $configPath 数据库配置文件路径
      */
-    public function Init(string $configPath):void{
+    public function init(string $configPath): void
+    {
         $this->configPath = $configPath;
     }
 
@@ -43,11 +48,11 @@ class DBPool
      * 从池里取一个链接
      * @throws DBException
      */
-    public function GetDB(string $key): DB
+    public function getDB(string $key): DB
     {
         if (empty($this->pool[$key])) {
             //池里没有，创建一个
-            $config = $this->GetConfig($key);
+            $config = $this->getConfig($key);
             $db = new DB($config['host'], $config['port'], $config['dbname'], $config['charset'], $config['user'], $config['passwd']);
         } else {
             $db = array_pop($this->pool[$key]);
@@ -55,12 +60,12 @@ class DBPool
         return $db;
     }
 
-    public function PutDB(string $key, DB $db): void
+    public function putDB(string $key, DB $db): void
     {
         if (empty($this->pool[$key])) {
             $this->pool[$key] = [];
         }
-        array_push($this->pool[$key], $db);
+        $this->pool[$key][] = $db;
     }
 
     /**
@@ -68,29 +73,29 @@ class DBPool
      * @return array
      * @throws DBException
      */
-    private function GetConfig(string $key): array
+    private function getConfig(string $key): array
     {
         $file = sprintf('%sDBConfig.%s.php', $this->configPath, $key);
         if (!is_file($file)) {
             throw new DBException("【{$key}】配置文件不存在：$file");
         }
         $config = include $file;
-        if(!isset($config['host'])){
+        if (!isset($config['host'])) {
             throw new DBException("【host】未配置");
         }
-        if(!isset($config['port'])){
+        if (!isset($config['port'])) {
             throw new DBException("【port】未配置");
         }
-        if(!isset($config['dbname'])){
+        if (!isset($config['dbname'])) {
             throw new DBException("【dbname】未配置");
         }
-        if(!isset($config['charset'])){
+        if (!isset($config['charset'])) {
             throw new DBException("【charset】未配置");
         }
-        if(!isset($config['user'])){
+        if (!isset($config['user'])) {
             throw new DBException("【user】未配置");
         }
-        if(!isset($config['passwd'])){
+        if (!isset($config['passwd'])) {
             throw new DBException("【passwd】未配置");
         }
         return $config;
