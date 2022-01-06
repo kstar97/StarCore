@@ -5,6 +5,7 @@ namespace StarCore\Exception;
 
 use StarCore\Common\Tool\GlobalFun;
 use StarCore\Core\File;
+use Throwable;
 
 class MainException
 {
@@ -22,7 +23,7 @@ class MainException
         set_exception_handler(callback: array("StarCore\Exception\MainException", "ExceptionHandler"));
     }
 
-    public static function ExceptionHandler(\Throwable $exception)
+    public static function ExceptionHandler(Throwable $exception)
     {
         if (method_exists($exception, "Render")) {
             //自定义类
@@ -33,19 +34,20 @@ class MainException
         }
     }
 
-    public static function Render(\Throwable $exception, string $file = "Exception")
+    public static function Render(Throwable $exception, string $file = "Exception")
     {
         $content = '[' . date("Y-m-d H:i:s") . ']' . PHP_EOL;
         $content .= get_class($exception) . ": {$exception->getMessage()} in {$exception->getFile()}:{$exception->getLine()} ErrorCode:{$exception->getCode()}" . PHP_EOL;
         $content .= "Stack trace:" . PHP_EOL;
         foreach ($exception->getTrace() as $trace) {
             $args = json_encode($trace['args']);
-            $class = isset($trace['class']) ? $trace['class'] : "";
-            $type = isset($trace['type']) ? $trace['type'] : " ";
+            $class = $trace['class'] ?? "";
+            $type = $trace['type'] ?? " ";
             $content .= "    {$trace['file']}({$trace['line']}): {$class}{$type}{$trace['function']}({$args})" . PHP_EOL;
         }
         if (self::$debug) {
             GlobalFun::echoHtml($content);
+            exit;
         } else {
             $date = date("Ymd");
             $file = new File(self::$logPath . $file . "_" . $date);
