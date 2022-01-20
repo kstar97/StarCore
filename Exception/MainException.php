@@ -40,7 +40,7 @@ class MainException
         $content .= get_class($exception) . ": {$exception->getMessage()} in {$exception->getFile()}:{$exception->getLine()} ErrorCode:{$exception->getCode()}" . PHP_EOL;
         $content .= "Stack trace:" . PHP_EOL;
         foreach ($exception->getTrace() as $trace) {
-            $args = json_encode($trace['args']);
+            $args = isset($trace['args']) ? json_encode($trace['args']) : "";
             $class = $trace['class'] ?? "";
             $type = $trace['type'] ?? " ";
             $content .= "    {$trace['file']}({$trace['line']}): {$class}{$type}{$trace['function']}({$args})" . PHP_EOL;
