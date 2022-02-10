@@ -106,14 +106,14 @@ class DB
     }
 
     /**
-     * @param array $data
      * @return int
+     * @throws DBException
      */
     public function delete(): int
     {
         $sql = $this->sqlGen->delete();
         $where = $this->sqlGen->whereData();
-        if (empty($where)){
+        if (empty($where)) {
             throw new DBException("删除操作必须带条件Where");
         }
         $this->sqlGen->reset();
@@ -128,7 +128,7 @@ class DB
      * @param array $param
      * @return array
      */
-    public function query($sql, $param = []): array
+    public function query($sql, array $param = []): array
     {
         $data = [];
         $pre = $this->link->prepare($sql);
@@ -136,7 +136,8 @@ class DB
             $pre->execute($param);
             $data = $pre->fetchAll();
         } catch (Throwable $exception) {
-            MainException::Render($exception);
+            $errorInfo = $this->errorInfo($sql, $param);
+            MainException::Render($exception, $errorInfo);
         }
         return $data;
     }
@@ -146,7 +147,7 @@ class DB
      * @param array $param
      * @return int
      */
-    public function execute($sql, $param = []): int
+    public function execute($sql, array $param = []): int
     {
         $rows = 0;
         try {
@@ -154,7 +155,8 @@ class DB
             $pre->execute($param);
             $rows = $pre->rowCount();
         } catch (Throwable $exception) {
-            MainException::Render($exception);
+            $errorInfo = $this->errorInfo($sql, $param);
+            MainException::Render($exception, $errorInfo);
         }
         return $rows;
     }
@@ -164,5 +166,16 @@ class DB
     public function lastInsertId($name = null): int
     {
         return $this->link->lastInsertId($name);
+    }
+
+    private function errorInfo(string $sql, array $param): string
+    {
+        foreach ($param as $v) {
+            $pos = strpos($sql, "?");
+            if ($pos !== false) {
+                $sql = substr_replace($sql, var_export($v, true), $pos, 1);
+            }
+        }
+        return "SQL[{$sql}]";
     }
 }

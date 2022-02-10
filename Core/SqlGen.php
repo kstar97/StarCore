@@ -22,7 +22,7 @@ class SqlGen
     {
         $this->table = '';
         $this->field = '*';
-        $this->where = 'WHERE 1 ';
+        $this->where = '';
         $this->order = '';
         $this->limit = '';
         $this->whereData = [];
@@ -52,7 +52,7 @@ class SqlGen
      */
     public function where(string $field, string $Operator, string|int $value, string $logic = "AND")
     {
-        $this->where .= "{$logic} {$field} {$Operator} ? ";
+        $this->where .= $this->where == "" ? "WHERE {$field} {$Operator} ?" : " {$logic} {$field} {$Operator} ?";
         $this->whereData[] = $value;
     }
 
@@ -98,7 +98,11 @@ class SqlGen
     public function select(): string
     {
         #SELECT *　FROM user WHERE 1=1 ORDER BY LIMIT 1
-        return "SELECT {$this->field} FROM {$this->table} {$this->where} {$this->order} {$this->limit}";
+        $sql = "SELECT {$this->field} FROM {$this->table}";
+        $sql .= $this->where != "" ? " " . $this->where : "";
+        $sql .= $this->order != "" ? " " . $this->order : "";
+        $sql .= $this->limit != "" ? " " . $this->limit : "";
+        return $sql;
     }
 
     /**
@@ -109,7 +113,9 @@ class SqlGen
     {
         #UPDATE `user` SET `home`='aaa' WHERE (`id`='1')
         $fields = '`' . implode('`=? ,`', array_keys($data)) . '`=?';
-        return "UPDATE {$this->table} SET {$fields} {$this->where}";
+        $sql = "UPDATE {$this->table} SET {$fields}";
+        $sql .= $this->where != "" ? " " . $this->where : "";
+        return $sql;
     }
 
     /**
@@ -119,6 +125,8 @@ class SqlGen
     public function delete(): string
     {
         #DELETE FROM `user` WHERE (`id`='1')
-        return "DELETE FROM {$this->table} {$this->where}";
+        $sql = "DELETE FROM {$this->table}";
+        $sql .= $this->where != "" ? " " . $this->where : "";
+        return $sql;
     }
 }

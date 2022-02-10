@@ -34,10 +34,10 @@ class MainException
         }
     }
 
-    public static function Render(Throwable $exception, string $file = "Exception")
+    public static function Render(Throwable $exception, string $errorInfo = "", string $file = "Exception")
     {
         $content = '[' . date("Y-m-d H:i:s") . ']' . PHP_EOL;
-        $content .= get_class($exception) . ": {$exception->getMessage()} in {$exception->getFile()}:{$exception->getLine()} ErrorCode:{$exception->getCode()}" . PHP_EOL;
+        $content .= get_class($exception) . ": {$errorInfo} {$exception->getMessage()} in {$exception->getFile()}:{$exception->getLine()} ErrorCode:{$exception->getCode()}" . PHP_EOL;
         $content .= "Stack trace:" . PHP_EOL;
         foreach ($exception->getTrace() as $trace) {
             $args = isset($trace['args']) ? json_encode($trace['args']) : "";
